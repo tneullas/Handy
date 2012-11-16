@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Handy</title>
+		<script src="lib/Background.js"></script>
+		<script src="lib/Bubble.js"></script>
+		<script src="lib/Color.js"></script>
+		<script src="lib/Element.js"></script>
+		<script src="lib/ElementPicker.js"></script>
+		<script src="lib/Helper.js"></script>
+		<script src="lib/Sound.js"></script>
+		<script src="lib/Visualization.js"></script>
+		<script src="lib/Webcam.js"></script>
+		<script src="lib/Game.js"></script>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+
+	<body onload="">
+		<video id ="video">Your browser is not compatible with HTML5 video, please upgrade it</video>
+		<canvas id="myCanvas" width="320" height="240"></canvas>
+		<div id="infos"></div>
+	</body>
+	
+	<!-- <script id="shader-fs" type="x-shader/x-fragment">
+		/*
+		uniform sampler2D webcam;
+		uniform sampler2D background;
+		uniform vec4 rouge;
+		uniform vec4 bleu;
+		uniform vec4 vert;
+		uniform vec4 cyan;
+		uniform float TOL;
+		vec4 col;
+
+		bool findCol(vec4 colcomp, float tol){
+			if(
+				(col.x <= colcomp.x+tol) && (col.x >= colcomp.x-tol) &&
+				(col.y <= colcomp.y+tol) && (col.y >= colcomp.y-tol)&&
+				(col.z <= colcomp.z+tol) && (col.z >= colcomp.z-tol)
+			){
+				col=colcomp;
+				return true;
+			}
+			return false;
+		}
+		void main(void)
+		{
+			col = texture2D(webcam, gl_TexCoord[0].xy);
+			vec4 colbg = texture2D(background, gl_TexCoord[0].xy);
+
+			if(!findCol(rouge, TOL) && !findCol(bleu, TOL) && !findCol(vert, TOL) && !findCol(cyan, TOL)
+			){
+				// Methode par extraction de background
+				float tolExtraction=0.25;
+				if(
+					(col.x <= colbg.x+tolExtraction) && (col.x >= colbg.x-tolExtraction) &&
+					(col.y <= colbg.y+tolExtraction) && (col.y >= colbg.y-tolExtraction)&&
+					(col.z <= colbg.z+tolExtraction) && (col.z >= colbg.z-tolExtraction)
+				){
+					col=1.;
+				}
+				else{ 
+					col=0.;
+				}
+			}
+		   gl_FragColor = col;
+		}
+		
+		
+		precision mediump float;
+		void main(void) {
+			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		}
+		*/
+
+
+
+	</script>
+
+	<script id="shader-vs" type="x-shader/x-vertex">
+	/*
+		attribute vec3 aVertexPosition;
+
+		uniform mat4 uMVMatrix;
+		uniform mat4 uPMatrix;
+
+		void main(void) {
+			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+		}
+		*/
+	</script>-->
+
+	<script>
+		function relMouseCoords(event){
+			var totalOffsetX = 0;
+			var totalOffsetY = 0;
+			var canvasX = 0;
+			var canvasY = 0;
+			var currentElement = this;
+
+			do{
+				totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+				totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+			}
+			while(currentElement = currentElement.offsetParent)
+
+			canvasX = event.pageX - totalOffsetX;
+			canvasY = event.pageY - totalOffsetY;
+
+			return {x:canvasX, y:canvasY}
+		}
+		HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+		
+		g = new Game()
+		
+	</script>
+</html>
