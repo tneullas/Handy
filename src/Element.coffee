@@ -6,7 +6,7 @@ class Element
 		@bubble = bubble
 		
 	setBubble: ( obj ) ->
-		if obj isNaN
+		if isNaN( obj )
 			console.error 'set Bubble on NAN : ' + obj
 			return
 		@bubble = obj

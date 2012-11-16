@@ -16,7 +16,7 @@ class ElementPicker
 			pos = ( coords.x + coords.y ) * 4
 			imagedata = @context.getImageData evt.offsetX, evt.offsetY, 1, 1
 			color = new Color imagedata.data[ 0 ], imagedata.data[ 1 ], imagedata.data[ 2 ], 255
-			sound = new Sound elementList.length + ".wav"
+			sound = new Sound @elementList.length
 			element = new Element color, sound
 			@elementList.push element
 			@canvas.onmousedown = undefined
@@ -46,8 +46,11 @@ class ElementPicker
 	pickElement: ->
 		randElementList = Math.floor( Math.random() * @elementNumber )
 		randBubble = Math.floor( Math.random() * @nbBubbles )
-		elementToAdd = window.Helper.clone( @elementList[ randElementList ] )
-		elementToAdd.setBubble randBubble
+		# elementToAdd = window.Helper.clone( @elementList[ randElementList ] ) # Not working because of unknown audio error on constructor
+		# elementToAdd.setBubble randBubble
+		color = @elementList[ randElementList ].color
+		sound = @elementList[ randElementList ].sound
+		elementToAdd = new Element color, sound, randBubble
 		@orderOfElement.push elementToAdd
 	
 	draw: ( context, video, indicesOfLevel )->

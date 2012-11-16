@@ -1,5 +1,4 @@
 class Helper
-			
 	clone: (obj) ->
 		if not obj? or typeof obj isnt 'object'
 			return obj
@@ -47,4 +46,4 @@ class Helper
   # window.setTimeout(callback, 1000 / 60)
 # )()
 
-window.Helper = Helper # export scope
+window.Helper = new Helper() # export scope

@@ -60,6 +60,7 @@ class Game
 				console.log evt.keyCode
 				
 	elementIsDetected: ->
+		@elementPicker.orderOfElement[ @indicesOfLevel ].sound.play()
 		@score += 10
 		@indicesOfLevel++
 		if @indicesOfLevel == @level
