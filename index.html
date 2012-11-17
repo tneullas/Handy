@@ -3,9 +3,11 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Handy</title>
+		<script src="external_lib/glMatrix.min.js"></script>
 		<script src="lib/Background.js"></script>
 		<script src="lib/Bubble.js"></script>
 		<script src="lib/Color.js"></script>
+		<script src="lib/CanvasManager.js"></script>
 		<script src="lib/Element.js"></script>
 		<script src="lib/ElementPicker.js"></script>
 		<script src="lib/Helper.js"></script>
@@ -20,9 +22,10 @@
 		<video id ="video">Your browser is not compatible with HTML5 video, please upgrade it</video>
 		<canvas id="myCanvas" width="320" height="240"></canvas>
 		<div id="infos"></div>
+		<canvas id="my3dCanvas" width="320" height="240"></canvas>
 	</body>
 	
-	<!-- <script id="shader-fs" type="x-shader/x-fragment">
+	<script id="shader-fs" type="x-shader/x-fragment">
 		/*
 		uniform sampler2D webcam;
 		uniform sampler2D background;
@@ -67,19 +70,19 @@
 		   gl_FragColor = col;
 		}
 		
-		
+		*/
 		precision mediump float;
 		void main(void) {
 			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 		}
-		*/
+		
 
 
 
 	</script>
 
 	<script id="shader-vs" type="x-shader/x-vertex">
-	/*
+	
 		attribute vec3 aVertexPosition;
 
 		uniform mat4 uMVMatrix;
@@ -88,8 +91,8 @@
 		void main(void) {
 			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
 		}
-		*/
-	</script>-->
+		
+	</script>
 
 	<script>
 		function relMouseCoords(event){

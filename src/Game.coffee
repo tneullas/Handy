@@ -2,6 +2,7 @@ class Game
 	constructor: ->
 		@canvas = null
 		@context = null
+		@gl = null
 		@elementNumber = 2
 		@bubbleNumber = 4
 		@isOnPause = false
@@ -26,12 +27,14 @@ class Game
 	configure: ->
 		@canvas = document.getElementById "myCanvas"
 		@context = @canvas.getContext '2d'
+		@cm = new CanvasManager "my3dCanvas"
 		@initKeyboard()
 		@webcam = new Webcam "video"
 		@background = new Background
 		@elementPicker = new ElementPicker @canvas, @context, @elementNumber, @bubbleNumber
 		@elementPicker.configure()
-		
+	
+
 	init: ->
 		@score = 0
 		@level = 1
@@ -93,6 +96,9 @@ class Game
 			@loose()
 		
 	draw: ->
+		if (@webcam.video)?
+			@cm.drawScene @webcam.video
+	
 		@clearCanvas()
 		@background.draw @context, @webcam.video
 		
