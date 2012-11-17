@@ -8,6 +8,14 @@ class Sound
 			@htmlSound = new Audio( "sound/" + @filename ) # buffers automatically when created
 		
 	play: ->
+		# To allow multiple audio instance we can create a new instance when the current is already played
+		# for moment we just restart currentState
+		
+		# if not @htmlSound.paused
+			# newHtmlSound = new Audio( "sound/" + @filename )
+			# newHtmlSound.play()
+		
+		@htmlSound.currentState = 0
 		@htmlSound.play()
 		
 	stop: ->
