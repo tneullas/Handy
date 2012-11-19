@@ -45,22 +45,24 @@ class Game
 	
 	initKeyboard: () ->
 		document.onkeypress = ( evt ) =>
-			if evt.keyCode == 80 or evt.keyCode == 112 # P
+			evt = evt || window.event
+			keyCode = evt.which || evt.keyCode
+			if keyCode == 80 or keyCode == 112 # P
 				@pause()
-			else if evt.keyCode == 88 or evt.keyCode == 120 # X
+			else if keyCode == 88 or keyCode == 120 # X
 				@background.init @context
-			else if evt.keyCode == 70 or evt.keyCode == 102 # F
+			else if keyCode == 70 or keyCode == 102 # F
 					window.Helper.toggleFullScreen()
-			else if evt.keyCode == 114 or evt.keyCode == 82 # R Configure new color, must init again after
+			else if keyCode == 114 or keyCode == 82 # R Configure new color, must init again after
 				@elementPicker.resetOrder()
 				@elementPicker.configure()
 				@init()
-			else if evt.keyCode == 68 or evt.keyCode == 100 # D FOR DEBUG ONLY
+			else if keyCode == 68 or keyCode == 100 # D FOR DEBUG ONLY
 				@elementIsDetected()
-			else if evt.keyCode == 116
+			else if keyCode == 116
 				# refresh (use to don't show this key on console)
 			else
-				console.log evt.keyCode
+				console.log keyCode
 				
 	elementIsDetected: ->
 		@elementPicker.orderOfElement[ @indicesOfLevel ].sound.play()

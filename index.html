@@ -26,14 +26,19 @@
 	</body>
 	
 	<script id="shader-fs" type="x-shader/x-fragment">
-		/*
+	
+		precision mediump float;
+
+		varying vec2 vTextureCoord;
 		uniform sampler2D webcam;
+		/*
 		uniform sampler2D background;
 		uniform vec4 rouge;
 		uniform vec4 bleu;
 		uniform vec4 vert;
 		uniform vec4 cyan;
 		uniform float TOL;
+		*/
 		vec4 col;
 
 		bool findCol(vec4 colcomp, float tol){
@@ -42,15 +47,16 @@
 				(col.y <= colcomp.y+tol) && (col.y >= colcomp.y-tol)&&
 				(col.z <= colcomp.z+tol) && (col.z >= colcomp.z-tol)
 			){
-				col=colcomp;
+				col = colcomp;
 				return true;
 			}
 			return false;
 		}
-		void main(void)
-		{
-			col = texture2D(webcam, gl_TexCoord[0].xy);
-			vec4 colbg = texture2D(background, gl_TexCoord[0].xy);
+		
+		void main(void) {
+			col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));
+			/*
+			vec4 colbg = texture2D(background, vec2(vTextureCoord.s, vTextureCoord.t));
 
 			if(!findCol(rouge, TOL) && !findCol(bleu, TOL) && !findCol(vert, TOL) && !findCol(cyan, TOL)
 			){
@@ -66,30 +72,23 @@
 				else{ 
 					col=0.;
 				}
-			}
-		   gl_FragColor = col;
+			}*/
+			gl_FragColor = col;
 		}
-		
-		*/
-		precision mediump float;
-		void main(void) {
-			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-		}
-		
-
-
-
 	</script>
 
 	<script id="shader-vs" type="x-shader/x-vertex">
-	
 		attribute vec3 aVertexPosition;
+		attribute vec2 aTextureCoord;
 
 		uniform mat4 uMVMatrix;
 		uniform mat4 uPMatrix;
 
+		varying vec2 vTextureCoord;
+
 		void main(void) {
 			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+			vTextureCoord = aTextureCoord;
 		}
 		
 	</script>

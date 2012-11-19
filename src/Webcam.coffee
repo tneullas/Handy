@@ -14,7 +14,6 @@ class Webcam
 			console.info "User media is not accessible on this Browser version"
 	
 	error: ( error ) ->
-		console.log error
 		console.error 'An error on streaming: [CODE ' + error.code + ']'
 			
 	success: ( stream ) ->

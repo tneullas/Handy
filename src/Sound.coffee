@@ -10,13 +10,13 @@ class Sound
 	play: ->
 		# To allow multiple audio instance we can create a new instance when the current is already played
 		# for moment we just restart currentState
-		
-		# if not @htmlSound.paused
-			# newHtmlSound = new Audio( "sound/" + @filename )
-			# newHtmlSound.play()
-		
-		@htmlSound.currentState = 0
+		# @htmlSound.currentState = 0
 		@htmlSound.play()
+		
+		if not @htmlSound.paused
+			newHtmlSound = new Audio( "sound/" + @filename )
+			newHtmlSound.play()
+		
 		
 	stop: ->
 		@htmlSound.pause()

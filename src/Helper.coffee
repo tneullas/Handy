@@ -27,10 +27,8 @@ class Helper
 				console.log "norm"
 				document.documentElement.requestFullScreen()
 			else if (document.documentElement.mozRequestFullScreen)
-				console.log "moz"
 				document.documentElement.mozRequestFullScreen()
 			else if (document.documentElement.webkitRequestFullScreen)
-				console.log "webkit"
 				document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
 		else
 			console.log "else"
