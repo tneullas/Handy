@@ -62,7 +62,11 @@ class CanvasManager
 		
 		return shader
 
-
+	addVariableToShaders: ( name, value ) ->
+		variableIndex = @gl.getAttribLocation( @shaderProgram, name )
+		@gl.enableVertexAttribArray( variableIndex )
+		@gl.vertexAttribPointer( variableIndex, value, @gl.FLOAT, false, 0, 0 )
+		
 	initShaders: ->
 		fragmentShader = @getShader(@gl, "shader-fs")
 		vertexShader = @getShader(@gl, "shader-vs")
@@ -76,7 +80,7 @@ class CanvasManager
 			alert("Could not initialise shaders")
 		
 		@gl.useProgram(@shaderProgram)
-
+		
 		@shaderProgram.vertexPositionAttribute = @gl.getAttribLocation(@shaderProgram, "aVertexPosition")
 		@gl.enableVertexAttribArray(@shaderProgram.vertexPositionAttribute)
 		

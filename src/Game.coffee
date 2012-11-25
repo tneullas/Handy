@@ -33,6 +33,9 @@ class Game
 		@background = new Background
 		@elementPicker = new ElementPicker @canvas, @context, @elementNumber, @bubbleNumber
 		@elementPicker.configure()
+		@cm.addVariableToShaders( "TOL", @background.tolerance )
+		for el, i in @elementPicker.elementList
+			@cm.addVariableToShaders( "COL" + i, el.color )
 	
 
 	init: ->
