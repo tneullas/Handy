@@ -7,7 +7,6 @@ class CanvasManager
 			return
 			
 		@shaderProgram = null
-		# @triangleVertexPositionBuffer = null
 		@squareVertexPositionBuffer = null
 		@squareVertexTextureCoordBuffer = null
 		@squareVertexIndexBuffer = null
@@ -58,14 +57,32 @@ class CanvasManager
 
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
 			alert "getShader : " + gl.getShaderInfoLog(shader)
-			return null;
+			return null
 		
 		return shader
 
-	addVariableToShaders: ( name, value ) ->
-		variableIndex = @gl.getAttribLocation( @shaderProgram, name )
-		@gl.enableVertexAttribArray( variableIndex )
-		@gl.vertexAttribPointer( variableIndex, value, @gl.FLOAT, false, 0, 0 )
+	addVariableToShaders: ( name, data ) ->		
+		variableIndex = @gl.getUniformLocation(@shaderProgram, name)
+		@gl.uniform1f(variableIndex, data)
+		
+	addVectorToShaders: ( name, data ) ->
+		variableIndex = @gl.getUniformLocation( @shaderProgram, name )
+		@gl.uniform4fv(variableIndex, data)
+		
+	# data must be an imageElement a canvasElement or a videoElement
+	# TODO background is not send, function is probably not working correctly
+	addTextureToShaders: ( name, data ) ->
+		texture = @gl.createTexture()
+		@gl.bindTexture(@gl.TEXTURE_2D, texture)
+		# these properties let you upload textures of any size
+		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE)
+		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.CLAMP_TO_EDGE)
+		# these determine how interpolation is made if the image is being scaled up or down
+		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
+		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
+		@gl.activeTexture(@gl.TEXTURE1)
+		@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, 1, 1, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, data)
+		@gl.uniform1i( @gl.getUniformLocation( @shaderProgram, name ) , 0 )
 		
 	initShaders: ->
 		fragmentShader = @getShader(@gl, "shader-fs")
@@ -90,30 +107,12 @@ class CanvasManager
 		@shaderProgram.pMatrixUniform = @gl.getUniformLocation(@shaderProgram, "uPMatrix")
 		@shaderProgram.mvMatrixUniform = @gl.getUniformLocation(@shaderProgram, "uMVMatrix")
 		
-		
-		# @shaderProgram.webcam = @gl.getAttribLocation(@shaderProgram, "webcam")
-		# @gl.enableVertexAttribArray(@webcam)
-		
-		# @shaderProgram.background = @gl.getUniformLocation(@shaderProgram, "background")
-		
 
 	setMatrixUniforms: ->
 		@gl.uniformMatrix4fv(@shaderProgram.pMatrixUniform, false, @pMatrix)
 		@gl.uniformMatrix4fv(@shaderProgram.mvMatrixUniform, false, @mvMatrix)
 
-
 	initBuffers: ->
-		# @triangleVertexPositionBuffer = @gl.createBuffer()
-		# @gl.bindBuffer(@gl.ARRAY_BUFFER, @triangleVertexPositionBuffer)
-		# vertices = [
-			 # 0.0, 1.0, 0.0,
-			# -1.0, -1.0, 0.0,
-			 # 1.0, -1.0, 0.0
-		# ]
-		# @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array(vertices), @gl.STATIC_DRAW)
-		# @triangleVertexPositionBuffer.itemSize = 3
-		# @triangleVertexPositionBuffer.numItems = 3
-
 		@squareVertexPositionBuffer = @gl.createBuffer()
 		@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
 		vertices = [
@@ -147,6 +146,7 @@ class CanvasManager
 		
 		
 	drawScene: ( video ) ->
+		# TODO Should draw in 2D and extend square to full canvas size
 		@gl.clearColor(0.0, 0.0, 0.0, 1.0)
 		@gl.enable(@gl.DEPTH_TEST)
 		
@@ -157,13 +157,7 @@ class CanvasManager
 		
 		
 		mat4.identity(@mvMatrix)
-		# mat4.translate(@mvMatrix, [-1.5, 0.0, -7.0])
-		# @gl.bindBuffer(@gl.ARRAY_BUFFER, @triangleVertexPositionBuffer)
-		# @gl.vertexAttribPointer(@shaderProgram.vertexPositionAttribute, @triangleVertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-		# @setMatrixUniforms()
-		# @gl.drawArrays(@gl.TRIANGLES, 0, @triangleVertexPositionBuffer.numItems)
-
-			
+		
 		if video?
 			texture = @gl.createTexture()
 			@gl.bindTexture(@gl.TEXTURE_2D, texture)
@@ -175,7 +169,7 @@ class CanvasManager
 			@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
 			@gl.bindTexture(@gl.TEXTURE_2D, null)
 			
-			mat4.translate(@mvMatrix, [0.0, 0.0, -3.0])
+			mat4.translate(@mvMatrix, [0.0, 0.0, -2.5])
 			@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
 			@gl.vertexAttribPointer(@shaderProgram.vertexPositionAttribute, @squareVertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
 
@@ -187,14 +181,10 @@ class CanvasManager
 			@gl.bindTexture(@gl.TEXTURE_2D, texture)
 			@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, video)
 			@gl.uniform1i(@shaderProgram.webcam, 0)
-			# @gl.uniform1i(@shaderProgram.background, 0)
 			
 			@gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @squareVertexIndexBuffer)
 			@setMatrixUniforms()
 			@gl.drawElements(@gl.TRIANGLES, @squareVertexIndexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
-			# @gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
-			# @setMatrixUniforms()
-			# @gl.drawArrays(@gl.TRIANGLE_STRIP, 0, @squareVertexPositionBuffer.numItems)
 			
 			
 			

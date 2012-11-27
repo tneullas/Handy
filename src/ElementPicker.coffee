@@ -9,7 +9,7 @@ class ElementPicker
 		@orderOfElement = [] # contain all element in the order they have been picked (could contain only indices for performance)
 		
 	
-	addColorRecursively: ->
+	addColorRecursively: () ->
 		document.getElementById("infos").innerHTML = "Pick a new color by clicking on picture"
 		@canvas.onmousedown  = ( evt ) =>
 			coords = @canvas.relMouseCoords evt # evt.offsetX, evt.offsetY is not cross browser and give sometimes bad result
@@ -23,11 +23,16 @@ class ElementPicker
 			if @elementList.length >= @elementNumber
 				@pickElement()
 				document.getElementById("infos").innerHTML = ""
+				for el, i in @elementList
+					col = el.color.getAsArray()
+					for j in [0 ... col.length]
+						col[ j ] /= 255
+					window.g.cm.addVectorToShaders( "col" + i, col )
 			else
 				@addColorRecursively()
 	
 	
-	configure: ->
+	configure: ( )->
 		console.info "initializing Element Picker"
 		@elementList = []
 		

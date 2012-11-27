@@ -10,7 +10,7 @@ class Webcam
 			console.info "User media is on, let's go !"
 			navigator.getUserMedia({video: true, audio: false}, @success, @error)
 		else
-			# video.src = 'somevideo.webm'; // fallback.
+			# video.src = 'somevideo.webm' // fallback.
 			console.info "User media is not accessible on this Browser version"
 	
 	error: ( error ) ->

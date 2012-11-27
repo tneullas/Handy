@@ -31,57 +31,61 @@
 
 		varying vec2 vTextureCoord;
 		uniform sampler2D webcam;
-		/*
 		uniform sampler2D background;
-		uniform vec4 rouge;
-		uniform vec4 bleu;
-		uniform vec4 vert;
-		uniform vec4 cyan;
-		*/
+		
 		uniform vec4 col0;
 		uniform vec4 col1;
-		uniform float TOL;
+		uniform float tolBG;
 		vec4 col;
-
+		vec4 colbg;
+		vec4 newCol;
 		bool findCol(vec4 colcomp, float tol){
 			if(
-				(col.x <= colcomp.x+tol) && (col.x >= colcomp.x-tol) &&
-				(col.y <= colcomp.y+tol) && (col.y >= colcomp.y-tol)&&
-				(col.z <= colcomp.z+tol) && (col.z >= colcomp.z-tol)
+				(col.x <= colcomp.x + tol) && (col.x >= colcomp.x - tol) &&
+				(col.y <= colcomp.y + tol) && (col.y >= colcomp.y - tol) &&
+				(col.z <= colcomp.z + tol) && (col.z >= colcomp.z - tol)
 			){
-				col = colcomp;
+				//newCol = colcomp; // Line commented for debug
 				return true;
 			}
 			return false;
 		}
 		
 		void main(void) {
-			if (TOL < 15.){
-				col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));
+			col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));
+			colbg = texture2D(background, vec2(vTextureCoord.s, vTextureCoord.t));
+			
+			float tolExtraction = 0.18;
+			if(!findCol(col0, tolExtraction) && !findCol(col1, tolExtraction)){
+				// Methode par extraction de background
+				if(
+					(col.x <= colbg.x+tolBG) && (col.x >= colbg.x-tolBG) &&
+					(col.y <= colbg.y+tolBG) && (col.y >= colbg.y-tolBG) &&
+					(col.z <= colbg.z+tolBG) && (col.z >= colbg.z-tolBG)
+				){
+					newCol = vec4(1.0, 0.0, 0.0, 1.0);
+				}
+				else{
+					newCol = vec4(0.0, 0.0, 1.0, 1.0);
+				}
 			}
 			else{
-				col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));;
-				/*col = (1.,0.,0.,1.);*/
+				if(findCol(col0, tolExtraction)){
+					newCol = col0;
+				}
+				else if(findCol(col1, tolExtraction)){
+					newCol = col1;
+				}
+				else{
+					newCol = vec4(0.0, 1.0, 0.0, 1.0);
+				}
 			}
-			/*
-			vec4 colbg = texture2D(background, vec2(vTextureCoord.s, vTextureCoord.t));
-
-			if(!findCol(rouge, TOL) && !findCol(bleu, TOL) && !findCol(vert, TOL) && !findCol(cyan, TOL)
-			){
-				// Methode par extraction de background
-				float tolExtraction=0.25;
-				if(
-					(col.x <= colbg.x+tolExtraction) && (col.x >= colbg.x-tolExtraction) &&
-					(col.y <= colbg.y+tolExtraction) && (col.y >= colbg.y-tolExtraction)&&
-					(col.z <= colbg.z+tolExtraction) && (col.z >= colbg.z-tolExtraction)
-				){
-					col=1.;
-				}
-				else{ 
-					col=0.;
-				}
-			}*/
-			gl_FragColor = col;
+			if((col0.r == 0.) && (col0.g == 0.) && (col0.b == 0.)){
+				gl_FragColor = col;
+			}
+			else{
+				gl_FragColor = newCol;
+			}
 		}
 	</script>
 

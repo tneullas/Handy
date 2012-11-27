@@ -16,6 +16,9 @@ class Color
 
 	get: ->
 		return this
+		
+	getAsArray: ->
+		return [ @r, @g, @b, @a ]
 	
 	equalsWithTolerance: ( colorAsArray, tolerance ) ->
 		if ( ( colorAsArray[ 0 ] - tolerance ) <= @r and ( colorAsArray[ 0 ] + tolerance ) >= @r and ( colorAsArray[ 1 ] - tolerance ) <= @g and ( colorAsArray[ 1 ] + tolerance ) >= @g and ( colorAsArray[ 2 ] - tolerance ) <= @b and ( colorAsArray[ 2 ] + tolerance ) >= @b and ( colorAsArray[ 3 ] - tolerance ) <= @a and ( colorAsArray[ 2 ] + tolerance ) >= @a )

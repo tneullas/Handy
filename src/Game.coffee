@@ -33,10 +33,7 @@ class Game
 		@background = new Background
 		@elementPicker = new ElementPicker @canvas, @context, @elementNumber, @bubbleNumber
 		@elementPicker.configure()
-		@cm.addVariableToShaders( "TOL", @background.tolerance )
-		for el, i in @elementPicker.elementList
-			@cm.addVariableToShaders( "COL" + i, el.color )
-	
+		@cm.addVariableToShaders( "tolBG", @background.tolerance )
 
 	init: ->
 		@score = 0
@@ -74,7 +71,7 @@ class Game
 		if @indicesOfLevel == @level
 			@levelUp()
 		
-	
+	# TODO, colorDetect is not working and cause serious performance issues
 	colorDetect: ->
 		imagedata = @context.getImageData 0, 0, @context.canvas.width, @context.canvas.height
 		for i in imagedata.data by 4
@@ -85,8 +82,7 @@ class Game
 				col = elem.color
 				if col.equalsWithTolerance( [ imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], imagedata.data[ i + 3 ] ], 100 )
 					console.log "color founded on pos ", i, col
-					# @context.fillStyle = col.to_rgba()
-					# @context.fillRect( Math.floor(i / @context.canvas.width), i % @context.canvas.width, 1, 1 )
+					# @elementIsDetected()
 	
 	update: ->
 		# @colorDetect()
@@ -103,9 +99,8 @@ class Game
 	draw: ->
 		if (@webcam.video)?
 			@cm.drawScene @webcam.video
-	
+		# TODO All draw should be pass on webgl canvas (cm)
 		@clearCanvas()
-		@background.draw @context, @webcam.video
 		
 		@context.drawImage( @webcam.video, 0, 0, @context.canvas.width, @context.canvas.height)
 		# @context.translate @context.canvas.width,0
@@ -147,7 +142,7 @@ class Game
 		console.info "Level up !"
 		# level up give points (except on first level)
 		if @level > 1
-			@score += @time * 10;
+			@score += @time * 10
 		
 		@level++
 		
