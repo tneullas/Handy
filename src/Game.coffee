@@ -58,6 +58,7 @@ class Game
 				@elementPicker.configure()
 				@init()
 			else if keyCode == 68 or keyCode == 100 # D FOR DEBUG ONLY
+				@colorDetect()
 				@elementIsDetected()
 			else if keyCode == 116
 				# refresh (use to don't show this key on console)
@@ -71,21 +72,24 @@ class Game
 		if @indicesOfLevel == @level
 			@levelUp()
 		
-	# TODO, colorDetect is not working and cause serious performance issues
 	colorDetect: ->
+		# TODO use bubble position for detection
 		imagedata = @context.getImageData 0, 0, @context.canvas.width, @context.canvas.height
-		for i in imagedata.data by 4
-			# colorAsArray = [ imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], imagedata.data[ i + 3 ] ]
-			# console.log @color.to_rgba()
-			# console.log colorAsArray[ 0 ] - 70, colorAsArray[ 0 ] + 70, colorAsArray[ 1 ] - 70, colorAsArray[ 1 ] + 70, colorAsArray[ 2 ] - 70, colorAsArray[ 2 ] + 70, colorAsArray[ 3 ] - 70, colorAsArray[ 3 ] + 70
-			for elem in @elementPicker.elementList when elem != undefined
-				col = elem.color
-				if col.equalsWithTolerance( [ imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], imagedata.data[ i + 3 ] ], 100 )
-					console.log "color founded on pos ", i, col
-					# @elementIsDetected()
-	
+		founded = 0
+		limitFounded = 10
+		for d, i in imagedata.data by 4
+			if @elementPicker.orderOfElement.length and @elementPicker.orderOfElement[ @indicesOfLevel ] != undefined
+				col = @elementPicker.orderOfElement[ @indicesOfLevel ].color
+				if col.equalsWithTolerance( [ imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], imagedata.data[ i + 3 ] ], 75 )
+					# console.log "color founded : ", i, imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], col.getAsArray()
+					founded++
+					if founded >= limitFounded
+						@elementIsDetected()
+						return true
+		return false
+		
 	update: ->
-		# @colorDetect()
+		@colorDetect()
 		@updateTime()
 		
 	updateTime: ->
