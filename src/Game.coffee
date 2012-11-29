@@ -80,7 +80,7 @@ class Game
 			@levelUp()
 		
 	colorDetect: ->
-		tolerance = 75
+		tolerance = 25
 		if @elementPicker.orderOfElement.length and @elementPicker.orderOfElement[ @indicesOfLevel ] != undefined
 			col = @elementPicker.orderOfElement[ @indicesOfLevel ].color
 			pos = @elementPicker.bubbles[ @elementPicker.orderOfElement[ @indicesOfLevel ].bubble ].getIndices()

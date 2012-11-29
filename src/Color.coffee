@@ -21,7 +21,7 @@ class Color
 		return [ @r, @g, @b, @a ]
 	
 	equalsWithTolerance: ( colorAsArray, tolerance ) ->
-		if ( ( colorAsArray[ 0 ] - tolerance ) <= @r and ( colorAsArray[ 0 ] + tolerance ) >= @r and ( colorAsArray[ 1 ] - tolerance ) <= @g and ( colorAsArray[ 1 ] + tolerance ) >= @g and ( colorAsArray[ 2 ] - tolerance ) <= @b and ( colorAsArray[ 2 ] + tolerance ) >= @b and ( colorAsArray[ 3 ] - tolerance ) <= @a and ( colorAsArray[ 2 ] + tolerance ) >= @a )
+		if ( ( @r - tolerance ) <= colorAsArray[ 0 ] and ( @r + tolerance ) >= colorAsArray[ 0 ] and ( @g - tolerance ) <= colorAsArray[ 1 ] and ( @g + tolerance ) >= colorAsArray[ 1 ] and ( @b - tolerance ) <= colorAsArray[ 2 ] and ( @b + tolerance ) >= colorAsArray[ 2 ] and ( @a - tolerance ) <= colorAsArray[ 3 ] and ( @a + tolerance ) >= colorAsArray[ 3 ] )
 			return true
 		else
 			return false

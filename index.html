@@ -30,8 +30,8 @@
 		precision mediump float;
 
 		varying vec2 vTextureCoord;
-		uniform sampler2D webcam;
 		uniform sampler2D background;
+		uniform sampler2D webcam;
 		
 		uniform vec4 col0;
 		uniform vec4 col1;
@@ -45,7 +45,7 @@
 				(col.y <= colcomp.y + tol) && (col.y >= colcomp.y - tol) &&
 				(col.z <= colcomp.z + tol) && (col.z >= colcomp.z - tol)
 			){
-				//newCol = colcomp; // Line commented for debug
+				// newCol = colcomp; // Line commented for debug
 				return true;
 			}
 			return false;
@@ -55,34 +55,31 @@
 			col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));
 			colbg = texture2D(background, vec2(vTextureCoord.s, vTextureCoord.t));
 			
-			float tolExtraction = 0.18;
-			if(!findCol(col0, tolExtraction) && !findCol(col1, tolExtraction)){
-				// Methode par extraction de background
+			float tolExtraction = 0.1;
+			if(findCol(col0, tolExtraction)){
+				newCol = col0;
+			}
+			else if(findCol(col1, tolExtraction)){
+				newCol = col1;
+			}
+			else{
 				if(
 					(col.x <= colbg.x+tolBG) && (col.x >= colbg.x-tolBG) &&
 					(col.y <= colbg.y+tolBG) && (col.y >= colbg.y-tolBG) &&
 					(col.z <= colbg.z+tolBG) && (col.z >= colbg.z-tolBG)
 				){
-					newCol = vec4(1.0, 0.0, 0.0, 1.0);
+					newCol = vec4(0.0, 0.0, 0.0, 1.0);
 				}
 				else{
-					newCol = vec4(0.0, 0.0, 1.0, 1.0);
-				}
-			}
-			else{
-				if(findCol(col0, tolExtraction)){
-					newCol = col0;
-				}
-				else if(findCol(col1, tolExtraction)){
-					newCol = col1;
-				}
-				else{
-					newCol = vec4(0.0, 1.0, 0.0, 1.0);
+					newCol = vec4(1.0, 1.0, 1.0, 1.0);
 				}
 			}
 			if((col0.r == 0.) && (col0.g == 0.) && (col0.b == 0.)){
 				gl_FragColor = col;
 			}
+			/*else if((colbg.r == col.x) && (colbg.g == col.y) && (colbg.b == col.z)){
+				gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);;
+			}*/
 			else{
 				gl_FragColor = newCol;
 			}

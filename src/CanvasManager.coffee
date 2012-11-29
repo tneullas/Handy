@@ -69,10 +69,11 @@ class CanvasManager
 		variableIndex = @gl.getUniformLocation( @shaderProgram, name )
 		@gl.uniform4fv(variableIndex, data)
 		
-	# data must be an imageElement a canvasElement or a videoElement
-	# TODO background is not send, function is probably not working correctly
+	# data must be an imageElement a canvasElement or a videoElement or an Uint8Array
 	addTextureToShaders: ( name, data ) ->
+		@gl.bindTexture(@gl.TEXTURE_2D, null)
 		texture = @gl.createTexture()
+		@gl.activeTexture(@gl.TEXTURE1)
 		@gl.bindTexture(@gl.TEXTURE_2D, texture)
 		# these properties let you upload textures of any size
 		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE)
@@ -80,9 +81,8 @@ class CanvasManager
 		# these determine how interpolation is made if the image is being scaled up or down
 		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
 		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
-		@gl.activeTexture(@gl.TEXTURE0)
 		@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, 1, 1, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, data)
-		@gl.uniform1i( @gl.getUniformLocation( @shaderProgram, name ) , 0 )
+		@gl.uniform1i( @gl.getUniformLocation( @shaderProgram, name ) , 1 )
 		
 	initShaders: ->
 		fragmentShader = @getShader(@gl, "shader-fs")
@@ -176,12 +176,11 @@ class CanvasManager
 			@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexTextureCoordBuffer)
 			@gl.vertexAttribPointer(@shaderProgram.textureCoordAttribute, @squareVertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
 
-			
 			@gl.activeTexture(@gl.TEXTURE0)
 			@gl.bindTexture(@gl.TEXTURE_2D, texture)
 			@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, video)
 			@gl.uniform1i(@shaderProgram.webcam, 0)
-			
+	
 			@gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @squareVertexIndexBuffer)
 			@setMatrixUniforms()
 			@gl.drawElements(@gl.TRIANGLES, @squareVertexIndexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)

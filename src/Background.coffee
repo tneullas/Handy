@@ -4,8 +4,12 @@ class Background
 		@sourcePictures = []
 		@extractedBackground = [] # ImageElement
 		@numberOfSourcePictures = 3
-		@tolerance = 0.18 # Between 0 and 1
-		
+		@tolerance = 0.3 # Between 0 and 1
+	
+	get: ->
+		if @extractedBackground.length
+			return @extractedBackground
+	
 	init: ( context ) ->
 		console.info "initializing Background"
 		@sourcePictures = []
@@ -24,12 +28,13 @@ class Background
 	extractBackgroundFromSourcePictures: ( context ) ->
 		# console.log "----"
 		# OPTIMIZATION median could be obtained by getting out alpha
+		extractedBackgroundData = []
 		for i in [ 0 ... @sourcePictures[ 0 ].length ]
 			median = []
 			for sp, j in @sourcePictures
 				median[ j ] = sp[ i ]
 			median.sort()
-			@extractedBackground[ i ] = median[ Math.ceil( @numberOfSourcePictures / 2 ) ]
+			extractedBackgroundData[ i ] = median[ Math.ceil( @numberOfSourcePictures / 2 ) ]
 		
 		# next we push extracted background to a canvas which is send as a texture
 		# bg = document.createElement('canvas')
@@ -40,13 +45,13 @@ class Background
 		# ctx = bg.getContext('2d')
 		# imgData = ctx.createImageData( context.canvas.width, context.canvas.height )
 		# d = imgData.data
-		# for p, i in @extractedBackground
+		# for p, i in extractedBackgroundData
 			# d[ i ] = p
 		# ctx.putImageData(imgData, 0, 0)
 		# window.g.cm.addTextureToShaders( "background", bg )
 		
-		dataTypedArray = new Uint8Array(@extractedBackground)
-		window.g.cm.addTextureToShaders( "background", dataTypedArray )
+		@extractedBackground = new Uint8Array(extractedBackgroundData)
+		window.g.cm.addTextureToShaders( "background", @extractedBackground )
 		
 		# console.log @extractedBackground[ 0 ], @extractedBackground[ 1 ], @extractedBackground[ 2 ], @extractedBackground[ 3 ], @extractedBackground[ 4 ], @extractedBackground[ 5 ], @extractedBackground[ 6 ]
 	
