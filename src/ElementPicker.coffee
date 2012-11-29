@@ -38,8 +38,9 @@ class ElementPicker
 		
 		@bubbles.length = 0
 		for i in [ 1 .. @nbBubbles ]
-			@bubbles.push new Bubble i
-		
+			b = new Bubble i
+			b.buildPixelsIndices @context
+			@bubbles.push b
 		@addColorRecursively()
 	
 	
@@ -58,7 +59,7 @@ class ElementPicker
 		elementToAdd = new Element color, sound, randBubble
 		@orderOfElement.push elementToAdd
 	
-	draw: ( context, video, indicesOfLevel )->
+	draw: ( context, indicesOfLevel )->
 		# Draw bubble shape
 		for b in @bubbles
 			b.draw context

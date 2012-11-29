@@ -34,7 +34,15 @@ class Game
 		@elementPicker = new ElementPicker @canvas, @context, @elementNumber, @bubbleNumber
 		@elementPicker.configure()
 		@cm.addVariableToShaders( "tolBG", @background.tolerance )
-
+		@createOriginalCanvas()
+		
+	createOriginalCanvas: ->
+		originalWebcamCanvas = document.createElement('canvas')
+		originalWebcamCanvas.width = @context.canvas.width
+		originalWebcamCanvas.height = @context.canvas.height
+		@originalWebcamContext = originalWebcamCanvas.getContext('2d')
+		# document.body.appendChild originalWebcamCanvas
+		
 	init: ->
 		@score = 0
 		@level = 1
@@ -58,7 +66,6 @@ class Game
 				@elementPicker.configure()
 				@init()
 			else if keyCode == 68 or keyCode == 100 # D FOR DEBUG ONLY
-				@colorDetect()
 				@elementIsDetected()
 			else if keyCode == 116
 				# refresh (use to don't show this key on console)
@@ -73,15 +80,15 @@ class Game
 			@levelUp()
 		
 	colorDetect: ->
-		# TODO use bubble position for detection
-		imagedata = @context.getImageData 0, 0, @context.canvas.width, @context.canvas.height
-		founded = 0
-		limitFounded = 10
-		for d, i in imagedata.data by 4
-			if @elementPicker.orderOfElement.length and @elementPicker.orderOfElement[ @indicesOfLevel ] != undefined
-				col = @elementPicker.orderOfElement[ @indicesOfLevel ].color
-				if col.equalsWithTolerance( [ imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], imagedata.data[ i + 3 ] ], 75 )
-					# console.log "color founded : ", i, imagedata.data[ i ], imagedata.data[ i + 1 ], imagedata.data[ i + 2 ], col.getAsArray()
+		tolerance = 75
+		if @elementPicker.orderOfElement.length and @elementPicker.orderOfElement[ @indicesOfLevel ] != undefined
+			col = @elementPicker.orderOfElement[ @indicesOfLevel ].color
+			pos = @elementPicker.bubbles[ @elementPicker.orderOfElement[ @indicesOfLevel ].bubble ].getIndices()
+			imagedata = @originalWebcamContext.getImageData 0, 0, @originalWebcamContext.canvas.width, @originalWebcamContext.canvas.height
+			founded = 0
+			limitFounded = 10
+			for ind in pos
+				if col.equalsWithTolerance( [ imagedata.data[ ind ], imagedata.data[ ind + 1 ], imagedata.data[ ind + 2 ], imagedata.data[ ind + 3 ] ], tolerance )
 					founded++
 					if founded >= limitFounded
 						@elementIsDetected()
@@ -107,16 +114,19 @@ class Game
 		@clearCanvas()
 		
 		@context.drawImage( @webcam.video, 0, 0, @context.canvas.width, @context.canvas.height)
+		@originalWebcamContext.drawImage( @webcam.video, 0, 0, @context.canvas.width, @context.canvas.height)
+		
 		# @context.translate @context.canvas.width,0
 		# @context.scale -1,1
 		@drawTime()
 		@drawLevel()
 		@drawScore()
 		@visualization.draw @context
-		@elementPicker.draw @context, @webcam.video, @indicesOfLevel
+		@elementPicker.draw @context, @indicesOfLevel
 		
 	clearCanvas: ->
 		@context.clearRect( 0, 0, @context.canvas.width, @context.canvas.height)
+		@originalWebcamContext.clearRect( 0, 0, @originalWebcamContext.canvas.width, @originalWebcamContext.canvas.height)
 		
 	drawTime: ->
 		@context.fillStyle = '#F0F'

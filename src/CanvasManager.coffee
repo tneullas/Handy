@@ -3,7 +3,7 @@ class CanvasManager
 		if document.getElementById id
 			@canvas3D = document.getElementById id
 		else
-			console.error 'cant access canvas id ' + id
+			console.error "can't access canvas id " + id
 			return
 			
 		@shaderProgram = null
@@ -80,7 +80,7 @@ class CanvasManager
 		# these determine how interpolation is made if the image is being scaled up or down
 		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
 		@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
-		@gl.activeTexture(@gl.TEXTURE1)
+		@gl.activeTexture(@gl.TEXTURE0)
 		@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, 1, 1, 0, @gl.RGBA, @gl.UNSIGNED_BYTE, data)
 		@gl.uniform1i( @gl.getUniformLocation( @shaderProgram, name ) , 0 )
 		
