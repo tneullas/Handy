@@ -4,7 +4,6 @@ class Background
 		@sourcePictures = []
 		@extractedBackground = [] # ImageElement
 		@numberOfSourcePictures = 3
-		@tolerance = 0.3 # Between 0 and 1
 	
 	get: ->
 		if @extractedBackground.length
@@ -38,7 +37,6 @@ class Background
 		
 		# next we push extracted background to a canvas which is send as a texture
 		# bg = document.createElement('canvas')
-		# console.log context.canvas.width, context.canvas.height
 		# bg.width = context.canvas.width
 		# bg.height = context.canvas.height
 		# document.body.appendChild bg
@@ -48,7 +46,6 @@ class Background
 		# for p, i in extractedBackgroundData
 			# d[ i ] = p
 		# ctx.putImageData(imgData, 0, 0)
-		# window.g.cm.addTextureToShaders( "background", bg )
 		
 		@extractedBackground = new Uint8Array(extractedBackgroundData)
 		window.g.cm.addTextureToShaders( "background", @extractedBackground )

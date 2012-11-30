@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>Handy</title>
-		<script src="external_lib/glMatrix.min.js"></script>
+		<!--<script src="external_lib/glMatrix.min.js"></script>-->
 		<script src="lib/Background.js"></script>
 		<script src="lib/Bubble.js"></script>
 		<script src="lib/Color.js"></script>
@@ -26,19 +26,22 @@
 	</body>
 	
 	<script id="shader-fs" type="x-shader/x-fragment">
-	
 		precision mediump float;
 
 		varying vec2 vTextureCoord;
 		uniform sampler2D background;
 		uniform sampler2D webcam;
 		
+		uniform float tolExtraction; // Between 0 and 1
+		float tolBG = 0.3;
+		
 		uniform vec4 col0;
 		uniform vec4 col1;
-		uniform float tolBG;
+		
 		vec4 col;
 		vec4 colbg;
 		vec4 newCol;
+		
 		bool findCol(vec4 colcomp, float tol){
 			if(
 				(col.x <= colcomp.x + tol) && (col.x >= colcomp.x - tol) &&
@@ -55,7 +58,6 @@
 			col = texture2D(webcam, vec2(vTextureCoord.s, vTextureCoord.t));
 			colbg = texture2D(background, vec2(vTextureCoord.s, vTextureCoord.t));
 			
-			float tolExtraction = 0.1;
 			if(findCol(col0, tolExtraction)){
 				newCol = col0;
 			}
@@ -64,9 +66,9 @@
 			}
 			else{
 				if(
-					(col.x <= colbg.x+tolBG) && (col.x >= colbg.x-tolBG) &&
-					(col.y <= colbg.y+tolBG) && (col.y >= colbg.y-tolBG) &&
-					(col.z <= colbg.z+tolBG) && (col.z >= colbg.z-tolBG)
+					(col.x <= colbg.x + tolBG) && (col.x >= colbg.x - tolBG) &&
+					(col.y <= colbg.y + tolBG) && (col.y >= colbg.y - tolBG) &&
+					(col.z <= colbg.z + tolBG) && (col.z >= colbg.z - tolBG)
 				){
 					newCol = vec4(0.0, 0.0, 0.0, 1.0);
 				}
@@ -77,8 +79,8 @@
 			if((col0.r == 0.) && (col0.g == 0.) && (col0.b == 0.)){
 				gl_FragColor = col;
 			}
-			/*else if((colbg.r == col.x) && (colbg.g == col.y) && (colbg.b == col.z)){
-				gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);;
+			/*else if((colbg.r == 0.) && (colbg.g == 0.) && (colbg.b == 0.)){
+				gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
 			}*/
 			else{
 				gl_FragColor = newCol;
@@ -87,16 +89,18 @@
 	</script>
 
 	<script id="shader-vs" type="x-shader/x-vertex">
-		attribute vec3 aVertexPosition;
+		attribute vec2 aVertexPosition;
 		attribute vec2 aTextureCoord;
 
+		/*
 		uniform mat4 uMVMatrix;
 		uniform mat4 uPMatrix;
-
+		*/
 		varying vec2 vTextureCoord;
 
 		void main(void) {
-			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+			/*gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);*/
+			gl_Position = vec4(aVertexPosition, 0.0, 1.0);
 			vTextureCoord = aTextureCoord;
 		}
 		

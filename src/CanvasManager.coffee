@@ -10,8 +10,8 @@ class CanvasManager
 		@squareVertexPositionBuffer = null
 		@squareVertexTextureCoordBuffer = null
 		@squareVertexIndexBuffer = null
-		@mvMatrix = mat4.create()
-		@pMatrix = mat4.create()
+		# @mvMatrix = mat4.create()
+		# @pMatrix = mat4.create()
 		
 		@init()
 
@@ -108,21 +108,21 @@ class CanvasManager
 		@shaderProgram.mvMatrixUniform = @gl.getUniformLocation(@shaderProgram, "uMVMatrix")
 		
 
-	setMatrixUniforms: ->
-		@gl.uniformMatrix4fv(@shaderProgram.pMatrixUniform, false, @pMatrix)
-		@gl.uniformMatrix4fv(@shaderProgram.mvMatrixUniform, false, @mvMatrix)
+	# setMatrixUniforms: ->
+		# @gl.uniformMatrix4fv(@shaderProgram.pMatrixUniform, false, @pMatrix)
+		# @gl.uniformMatrix4fv(@shaderProgram.mvMatrixUniform, false, @mvMatrix)
 
 	initBuffers: ->
 		@squareVertexPositionBuffer = @gl.createBuffer()
 		@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
 		vertices = [
-			 1.0, 1.0, 0.0,
-			-1.0, 1.0, 0.0,
-			-1.0, -1.0, 0.0,
-			 1.0, -1.0, 0.0
+			 1.0, 1.0,
+			-1.0, 1.0,
+			-1.0, -1.0,
+			 1.0, -1.0,
 		]
 		@gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array(vertices), @gl.STATIC_DRAW)
-		@squareVertexPositionBuffer.itemSize = 3
+		@squareVertexPositionBuffer.itemSize = 2
 		@squareVertexPositionBuffer.numItems = 4
 		
 		@squareVertexTextureCoordBuffer = @gl.createBuffer()
@@ -145,47 +145,46 @@ class CanvasManager
 		@squareVertexIndexBuffer.numItems = 6
 		
 		
-	drawScene: ( video ) ->
-		# TODO Should draw in 2D and extend square to full canvas size
+	drawScene: ( video, background ) ->
 		@gl.clearColor(0.0, 0.0, 0.0, 1.0)
 		@gl.enable(@gl.DEPTH_TEST)
 		
 		@gl.viewport(0, 0, @gl.viewportWidth, @gl.viewportHeight)
 		@gl.clear(@gl.COLOR_BUFFER_BIT | @gl.DEPTH_BUFFER_BIT)
 
-		mat4.perspective(45, @gl.viewportWidth / @gl.viewportHeight, 0.1, 100.0, @pMatrix)
+		# mat4.perspective(45, @gl.viewportWidth / @gl.viewportHeight, 0.1, 100.0, @pMatrix)
 		
+		# mat4.identity(@mvMatrix)
 		
-		mat4.identity(@mvMatrix)
+		# mat4.translate(@mvMatrix, [0.0, 0.0, -2.5])
 		
 		if video?
 			texture = @gl.createTexture()
 			@gl.bindTexture(@gl.TEXTURE_2D, texture)
+			@gl.activeTexture(@gl.TEXTURE0)
 			# these properties let you upload textures of any size
 			@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE)
 			@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.CLAMP_TO_EDGE)
 			# these determine how interpolation is made if the image is being scaled up or down
 			@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
 			@gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
-			@gl.bindTexture(@gl.TEXTURE_2D, null)
+			@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, video)
+			@gl.uniform1i(@shaderProgram.webcam, 0)
 			
-			mat4.translate(@mvMatrix, [0.0, 0.0, -2.5])
+			# TODO background extraction is not really working
+			# if background?
+				# @addTextureToShaders "background", background
+			
 			@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
 			@gl.vertexAttribPointer(@shaderProgram.vertexPositionAttribute, @squareVertexPositionBuffer.itemSize, @gl.FLOAT, false, 0, 0)
 
 			@gl.bindBuffer(@gl.ARRAY_BUFFER, @squareVertexTextureCoordBuffer)
 			@gl.vertexAttribPointer(@shaderProgram.textureCoordAttribute, @squareVertexTextureCoordBuffer.itemSize, @gl.FLOAT, false, 0, 0)
-
-			@gl.activeTexture(@gl.TEXTURE0)
-			@gl.bindTexture(@gl.TEXTURE_2D, texture)
-			@gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.RGBA, @gl.RGBA, @gl.UNSIGNED_BYTE, video)
-			@gl.uniform1i(@shaderProgram.webcam, 0)
-	
+			
+			# @setMatrixUniforms()
+			
 			@gl.bindBuffer(@gl.ELEMENT_ARRAY_BUFFER, @squareVertexIndexBuffer)
-			@setMatrixUniforms()
 			@gl.drawElements(@gl.TRIANGLES, @squareVertexIndexBuffer.numItems, @gl.UNSIGNED_SHORT, 0)
-			
-			
 			
 
 window.CanvasManager = CanvasManager # export scope

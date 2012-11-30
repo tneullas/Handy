@@ -1,3 +1,11 @@
+# Améliorations à faire :
+# mettre des boutons pour toutes les actions
+# ajouter une phase de visualisation de la prochaine couleur
+# mettre en avant la fin du temps par une musique et un visuel plus stressant
+# déclencher la fin du niveau par n'importe quelle couleur au centre au lieu qu'il se déclenche avec la dernière couleur trouver (faire ça pour le premier niveau aussi)
+# visualiser les couleurs sélectionnées sur le côté de l'écran par des particules colorées ou quelques chose comme ça
+
+
 class Game
 	constructor: ->
 		@canvas = null
@@ -5,24 +13,31 @@ class Game
 		@gl = null
 		@elementNumber = 2
 		@bubbleNumber = 4
+		@tolerance = 0.1 # Tolerance for color (between 0 and 1)
 		@isOnPause = false
 		@configure()
 		@init()
 		
 			
-		# TODO use the more correct requestanimframe
+		# TODO use the more correct requestanimframe (need polyfill for opera)
 		setInterval =>
 			@update()
 			40
 		setInterval =>
 			@draw()
 			40
-			
+		
+		# (window.requestAnimFrame = ->
+		  # window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback) -> # function
+			# window.setTimeout callback, 1000 / 60
+		# )()
+		
 		# (@animLoop = =>
-			# window.requestAnimFrame(@animLoop())
+			# requestAnimFrame @animLoop()
+			# @update()
 			# @draw()
 		# )()
-		# @levelUp()
+		
 		
 	configure: ->
 		@canvas = document.getElementById "myCanvas"
@@ -33,7 +48,7 @@ class Game
 		@background = new Background
 		@elementPicker = new ElementPicker @canvas, @context, @elementNumber, @bubbleNumber
 		@elementPicker.configure()
-		@cm.addVariableToShaders( "tolBG", @background.tolerance )
+		@cm.addVariableToShaders( "tolExtraction", @tolerance )
 		@createOriginalCanvas()
 		
 	createOriginalCanvas: ->
@@ -58,7 +73,7 @@ class Game
 			if keyCode == 80 or keyCode == 112 # P
 				@pause()
 			else if keyCode == 88 or keyCode == 120 # X
-				@background.init @context
+				@background.init @originalWebcamContext
 			else if keyCode == 70 or keyCode == 102 # F
 					window.Helper.toggleFullScreen()
 			else if keyCode == 114 or keyCode == 82 # R Configure new color, must init again after
@@ -80,7 +95,6 @@ class Game
 			@levelUp()
 		
 	colorDetect: ->
-		tolerance = 25
 		if @elementPicker.orderOfElement.length and @elementPicker.orderOfElement[ @indicesOfLevel ] != undefined
 			col = @elementPicker.orderOfElement[ @indicesOfLevel ].color
 			pos = @elementPicker.bubbles[ @elementPicker.orderOfElement[ @indicesOfLevel ].bubble ].getIndices()
@@ -88,7 +102,7 @@ class Game
 			founded = 0
 			limitFounded = 10
 			for ind in pos
-				if col.equalsWithTolerance( [ imagedata.data[ ind ], imagedata.data[ ind + 1 ], imagedata.data[ ind + 2 ], imagedata.data[ ind + 3 ] ], tolerance )
+				if col.equalsWithTolerance( [ imagedata.data[ ind ], imagedata.data[ ind + 1 ], imagedata.data[ ind + 2 ], imagedata.data[ ind + 3 ] ], @tolerance * 255 )
 					founded++
 					if founded >= limitFounded
 						@elementIsDetected()
@@ -109,7 +123,7 @@ class Game
 		
 	draw: ->
 		if (@webcam.video)?
-			@cm.drawScene @webcam.video
+			@cm.drawScene @webcam.video, @background.get()
 		# TODO All draw should be pass on webgl canvas (cm)
 		@clearCanvas()
 		
